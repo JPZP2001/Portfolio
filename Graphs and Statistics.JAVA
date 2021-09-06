@@ -1,0 +1,206 @@
+//Juan Pablo Zubieta 562827 Rafa Garza 567313
+//Proyecto Final APS 
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.awt.*;
+import javax.print.attribute.standard.Media;
+import javax.swing.JFrame;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.ui.RefineryUtilities;
+
+import javax.print.attribute.standard.Media;
+
+class ProyectoFinal {
+  
+  
+  public static byte[][] llenarArreglo(byte[][] a, byte numeroPregunta, byte numeroAlumno){//Utilizando los limites creamos e inicializamos un arreglo con las respuestas del instrumento
+    Scanner s = new Scanner(System.in);
+    System.out.println("Ingrese la respuesta (5-1) dada por cada alumno en cada pregunta");
+    for (int i = 0; i < numeroPregunta; i++) { 
+      for (int j = 0; j < numeroAlumno; j++) {
+         System.out.println("Pregunta #"+(i+1)+". Alumno #"+(j+1)+":");//Pregunta por pregunta alumno por alumno
+         do{
+         a[i][j]=s.nextByte();
+         }while(a[i][j] < 1 || a[i][j] > 5);//La entrada de las respuestas esta validada
+      }
+   }
+  return a;//Se regresa el arreglo bidimensional con todas las respuestas
+ }
+ 
+
+ public static void frecuenciasPreguntas(byte[][] a, byte numeroPregunta, byte numeroAlumno){//Este metodo calcula la frecuencia de cada respuesta en cada pregunta y esta informacion es utilizada en las graficas.
+    for (int i = 0; i < numeroPregunta; i++) { 
+      byte cont1 =0;//Contador para la respuesta 1
+      byte cont2 =0;//Contador para la respuesta 2
+      byte cont3 =0;//Contador para la respuesta 3
+      byte cont4 =0;//Contador para la respuesta 4
+      byte cont5 =0;//Contador para la respuesta 5
+      for (int j = 0; j < numeroAlumno; j++) {
+        if(a[i][j] == 5)
+          cont5++;
+        else if(a[i][j] ==4)
+          cont4++;
+        else if(a[i][j] ==3)
+          cont3++;
+        else if(a[i][j] ==2)
+          cont2++;
+        else if(a[i][j] ==1)
+          cont1++;
+      }
+    System.out.println("\n"+"Pregunta #"+(i+1));
+    System.out.println("Frecuencia del valor 1 ="+cont1);
+    System.out.println("Frecuencia del valor 2 ="+cont2);
+    System.out.println("Frecuencia del valor 3 ="+cont3);
+    System.out.println("Frecuencia del valor 4 ="+cont4);
+    System.out.println("Frecuencia del valor 5 ="+cont5);
+    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+     //Despues se definen valores de "x", "y" y el nombre de la linea
+        dataset.addValue(cont1, "Frecuencia", "1");
+        dataset.addValue(cont2, "Frecuencia", "2");
+        dataset.addValue(cont3, "Frecuencia", "3");
+        dataset.addValue(cont4, "Frecuencia", "4");
+        dataset.addValue(cont5, "Frecuencia", "5");
+ 
+        //aqui damos formato a la grafica
+        JFreeChart lineChart = ChartFactory.createLineChart(
+                "Pregunta #"+(i+1), 
+                "calificaciones", 
+                "Resultados", 
+                dataset,
+                PlotOrientation.VERTICAL, true, true, false);
+ 
+ 
+        
+        ChartPanel panel = new ChartPanel(lineChart);
+ 
+        
+        
+        // Creamos la ventana
+        JFrame ventana = new JFrame("Grafica");
+        ventana.setVisible(true);
+        ventana.setSize(800, 600);
+        ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ 
+        ventana.add(panel);
+}
+}
+
+public static float mediaGlobal(byte[][] a, float media, byte numeroPregunta, byte numeroAlumno){//Este metodo calcula el promedio de todas las respuestas del arreglo a
+  float acum = 0;
+  DecimalFormat d = new DecimalFormat("0.00");
+  for (int i = 0; i < numeroPregunta; i++) { 
+    for (int j = 0; j < numeroAlumno; j++) {
+        acum += a[i][j];
+    }
+  }
+  media = acum/(numeroAlumno*numeroPregunta);
+  System.out.println("\n"+"La media global es de: "+d.format(media));
+  return media;
+}
+
+public static void modaGlobal(byte[][] a, byte moda, byte numeroPregunta, byte numeroAlumno){//Este metodo calcula cual fue la respuesta que mas se repitio
+  short cont1 =0;
+  short cont2 =0;
+  short cont3 =0;
+  short cont4 =0;
+  short cont5 =0;
+  for (int i = 0; i < numeroPregunta; i++) { //Utilizamos el mismo codigo que para calcular la frecuencia de cada respuesta en cada pregunta solo en diferente orden para sacar la global
+    for (int j = 0; j < numeroAlumno; j++) {
+      if(a[i][j] == 5)
+        cont5++;
+      else if(a[i][j] ==4)
+        cont4++;
+      else if(a[i][j] ==3)
+        cont3++;
+      else if(a[i][j] ==2)
+        cont2++;
+      else if(a[i][j] ==1)
+        cont1++;
+      }
+  }
+  //Se verifica cual fue el contador mas grande para determinar cual fue la moda
+  if(cont1 > cont2 && cont1 > cont3 && cont1 > cont4 && cont1 > cont5)
+    moda = 1;
+  else if(cont2 > cont3 && cont2 > cont4 && cont2 > cont5 && cont2 > cont1)
+    moda = 2;
+  else if(cont3 > cont2 && cont3 > cont4 && cont3 > cont5 && cont3 > cont1)
+    moda = 3;
+  else if(cont4 > cont1 && cont4 > cont2 && cont4 > cont3 && cont4 > cont5)
+    moda = 4;
+  else if(cont5 > cont1 && cont5 > cont2 && cont5 > cont3 && cont5 > cont4)
+    moda = 5;
+  if (moda >=1 && moda <=5)
+    System.out.println("La moda global es de: "+moda);
+  else 
+    System.out.println("No hay moda global");//Si ninguno es mayor que todos, significa que no hay moda
+}  
+
+public static void medianaGlobal(byte[][] a, byte numeroPregunta, byte numeroAlumno, double mediana){ //Este metodo calcula el numero que se encuentra exactamente enmedio de todos los valores
+  int b[] = new int[numeroAlumno*numeroPregunta]; //Un nuevo arreglo de 1d para poder ordenar todos los valores
+  int s=0; //Se utilizara para avanzar en el arreglo b
+  for(byte i=0; i<numeroPregunta;i++){
+    for(byte j=0; j<numeroAlumno;j++){
+      b[s]=a[i][j];
+      s++;
+    }
+  }
+  Arrays.sort(b);//Ordenamos los valores 
+  if ((numeroPregunta*numeroAlumno)%2==0)
+    mediana=(b[numeroPregunta*numeroAlumno/2]+b[numeroPregunta*numeroAlumno/2-1])/2.0; //Dependiendo si son un numero par o impar de datos es el proceso que tomara para encontrar su mediana
+  else
+    mediana=b[numeroPregunta*numeroAlumno/2+1];
+  System.out.println("La mediana global es de: "+mediana);
+}
+
+public static float varianzaGlobal (byte[][] a, float media, byte numeroPregunta, byte numeroAlumno){ //Este metodo calcula la varianza de nuestros datos
+  DecimalFormat d = new DecimalFormat("0.00");
+  float sum=0;
+  float varianza=0;
+  int total=0;
+  //la ecuacion de varianza necesita agarrar los datos individuales de cada alumno en cada pregunta
+    for (int i = 0; i < numeroPregunta; i++) { 
+      for (int j = 0; j < numeroAlumno; j++) {
+        sum += Math.pow((a[i][j] - media),2);//ecuacion de la varianza
+        if (sum<0){//Hacemos valor absoluto
+          sum=(sum*-1);}
+          }
+   }
+  varianza=sum/(numeroPregunta*numeroAlumno);
+  System.out.println("La varianza global es de: "+d.format(varianza));
+  return varianza;
+}
+
+public static void desviacionGlobal (double varianza){ //Este metodo encuentra la desviacion estandar
+  DecimalFormat d = new DecimalFormat("0.00");
+  double desvEst=Math.sqrt(varianza); //Como la desviacion es solo la raiz de la varianza, fue facil encontrar el resultado
+  System.out.println("La desviacion estandar global es de: "+d.format(desvEst));
+}
+    
+public static void main(String[] args) {
+  byte numeroAlumno = 0;
+  byte numeroPregunta = 0;
+  Scanner s = new Scanner(System.in);
+  System.out.println("Cuantas preguntas tiene la encuesta?(15)");
+  numeroPregunta = s.nextByte();//Numero de preguntas en la encuesta, siempre son 15 pero para probar el codigo lo hicimos variable
+  System.out.println("Cuantos alumnos contestaron la encuesta?(10)");
+  numeroAlumno = s.nextByte();//Numero de alumnos que contestaron el instrumento
+  byte[][] a = new byte [numeroPregunta][numeroAlumno]; //Arreglo principal donde se llenara con las respuestas de los alumnos
+  float media = 0;
+  byte moda = 0;
+  double mediana = 0;
+  double varianza=0;
+  double desvEst=0;
+  a = llenarArreglo(a, numeroPregunta, numeroAlumno);
+  frecuenciasPreguntas(a, numeroPregunta, numeroAlumno);
+  media = mediaGlobal(a,media, numeroPregunta, numeroAlumno);
+  modaGlobal(a,moda, numeroPregunta, numeroAlumno);
+  medianaGlobal(a, numeroPregunta, numeroAlumno, mediana);
+  varianza = varianzaGlobal(a, media, numeroPregunta, numeroAlumno);
+  desviacionGlobal (varianza);
+  }
+}
